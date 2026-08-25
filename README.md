@@ -11,7 +11,7 @@ Only Docker and Docker Compose. No local Node.js or PostgreSQL needed.
 ## Run
 
 ```bash
-git clone <this-repo-url>
+git clone https://github.com/StevenLeo7/movie-review-app.git
 cd movie-review-app
 docker compose up --build
 ```
