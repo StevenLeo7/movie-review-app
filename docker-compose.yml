@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: movieuser
+      POSTGRES_PASSWORD: moviepass
+      POSTGRES_DB: moviedb
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./backend/src/db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U movieuser -d moviedb"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build: ./backend
+    environment:
+      PORT: 3000
+      JWT_SECRET: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IlN0ZXZlbiBMZW8iLCJyb2xlIjoiZGV2ZWxvcGVyIiwiaWF0IjoxNzE2MjM5MDIyLCJleHAiOjE3Nzc3NzUwMjJ9.X8bZ3Rk9vT7mP1q_2Y4c8nL0K6w9x3vY1z2a3b4c5d6
+      OMDB_API_KEY: daacd07d
+      DATABASE_URL: postgres://movieuser:moviepass@db:5432/moviedb
+    ports:
+      - "3000:3000"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
